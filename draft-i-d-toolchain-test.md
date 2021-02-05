@@ -77,21 +77,17 @@ msc {
 
 # plantuml
 
-~~~ plantuml
-@startuml
+~~~ plantuml-utxt
 Alice -> Bob: test
-@enduml
 ~~~
 
 # mermaid
 
 ~~~ mermaid
-graph TD
-A[Christmas] -->|Get money| B(Go shopping)
-B --> C{Let me think}
-C -->|One| D[Laptop]
-C -->|Two| E[iPhone]
-C -->|Three| F[Car]
+pie title Pets adopted by volunteers
+    "Dogs" : 386
+    "Cats" : 85
+    "Rats" : 15
 ~~~
 
 # Security Considerations
