@@ -13,9 +13,9 @@ on:
   # Run tests for any PRs.
   pull_request:
 
-  schedule:
-    # At minute 0 past every 6th hour
-    - cron: '0 */6 * * *'
+  # schedule:
+  #   # At minute 0 past every 6th hour
+  #   - cron: '0 */6 * * *'
 
 env:
   IMAGE_NAME: i-d-toolchain
