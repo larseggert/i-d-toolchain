@@ -18,7 +18,7 @@ on:
     - cron: '0 */6 * * *'
 
 env:
-  IMAGE_NAME: larseggert/i-d-toolchain
+  IMAGE_NAME: i-d-toolchain
 
 jobs:
   # Run tests.
