@@ -35,6 +35,7 @@ RUN     pip install xml2rfc
 # install kramdown-rfc2629
 RUN     apk add --no-cache ruby
 RUN     gem install kramdown-rfc2629
+ENV     KRAMDOWN_REFCACHEDIR=/tmp
 
 # install tex2svg
 RUN     apk add --no-cache npm
@@ -68,5 +69,9 @@ RUN     echo 'java -jar /bin/plantuml.jar $@' >> /bin/plantuml
 RUN     chmod a+x /bin/plantuml
 
 # install mermaid
+RUN     apk add --no-cache chromium
 ENV     PUPPETEER_SKIP_DOWNLOAD=1
+ENV     PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium-browser"
 RUN     npm install -g @mermaid-js/mermaid-cli
+RUN     adduser --disabled-password user user
+USER    user
