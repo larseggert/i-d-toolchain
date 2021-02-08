@@ -11,14 +11,15 @@ This is free and unencumbered software released into the public domain.
 ## Usage
 
 Here is an example of how to use the docker image to generate text and HTML
-versions of the included test markdown document `draft-i-d-toolchain-test.md`:
+versions of the included test markdown document
+`draft-i-d-toolchain-test-00.md`:
 ```
 docker run \
-	--pull always \
-	-v $(pwd):/id:delegated \
-	--cap-add=SYS_ADMIN \
-	docker.pkg.github.com/larseggert/i-d-toolchain/i-d-toolchain:latest \
-	kdrfc -h -3 /id/draft-i-d-toolchain-test.md
+       --pull always \
+       -v $(pwd):/id:delegated \
+       --cap-add=SYS_ADMIN \
+       docker.pkg.github.com/larseggert/i-d-toolchain/i-d-toolchain:latest \
+       kdrfc -h -3 /id/draft-i-d-toolchain-test-00.md
 ```
 
 Here is a breakdown of what the components of this rather long command are:
@@ -26,9 +27,9 @@ Here is a breakdown of what the components of this rather long command are:
 * `docker run` executes a given command in a given docker container
 
 * `--pull always` makes sure that the latest published version of the docker
-  image provided in this repository is used. (This can be omitted, e.g., when
+  image provided in this repository is used. This can be omitted, e.g., when
   running without Internet connectivity, but then `docker pull` should be
-  occasionally run to update the image.)
+  occasionally run to update the image.
 
 * `-v $(pwd):/id:delegated` mounts the current directory into the docker
   container at the `/id` mount point. The name of the `/id` mount point can be
@@ -43,13 +44,12 @@ Here is a breakdown of what the components of this rather long command are:
 * `docker.pkg.github.com/larseggert/i-d-toolchain/i-d-toolchain:latest` is the
   name of the docker image to be run.
 
-* Finally, `kdrfc -h -3 /id/draft-i-d-toolchain-test.md` is the desired tool to
-  execute in the container. In this example, we execute `kdrfc` from
+* Finally, `kdrfc -h -3 /id/draft-i-d-toolchain-test-00.md` is the desired tool
+  to execute in the container. In this example, we execute `kdrfc` from
   [kramdown-rfc2629](https://github.com/cabo/kramdown-rfc2629) in order to
-  convert the example markdown document `draft-i-d-toolchain-test.md` in the
+  convert the example markdown document `draft-i-d-toolchain-test-00.md` in the
   local directory, which has been mounted into the container at the `/id` mount
   point (see above). This can be replaced by any other command, as desired.
-
 
 ## Installed components
 

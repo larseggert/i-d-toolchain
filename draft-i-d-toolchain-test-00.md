@@ -1,7 +1,7 @@
 ---
 
 title: Stress-Test for i-d-toolchain
-docname: draft-i-d-toolchain-test
+docname: draft-i-d-toolchain-test-00
 date: {DATE}
 category: info
 ipr: trust200902
@@ -30,17 +30,16 @@ can use.
 
 # Introduction
 
-# Conventions
+The subsections try to exercise all the different tools that kramdown-rfc2629
+can use.
 
-{::boilerplate bcp14}
-
-# math
+## math
 
 ~~~ math
 K = \sqrt[3]{\frac{W_{max} - cwnd_{start}}{C}}
 ~~~
 
-# goat
+## goat
 
 ~~~ goat
   .-.
@@ -50,7 +49,7 @@ C| | |D
  '___'
 ~~~
 
-# ditaa
+## ditaa
 
 ~~~ ditaa
 ----+  /----\  +----+
@@ -59,7 +58,7 @@ C| | |D
     v  \-=--+  +----+
 ~~~
 
-# mscgen
+## mscgen
 
 ~~~ mscgen
 msc {
@@ -75,13 +74,13 @@ msc {
 }
 ~~~
 
-# plantuml
+## plantuml
 
 ~~~ plantuml-utxt
 Alice -> Bob: test
 ~~~
 
-# mermaid
+## mermaid
 
 ~~~ mermaid
 pie title Pets adopted by volunteers

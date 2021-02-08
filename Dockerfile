@@ -16,6 +16,13 @@ RUN     cmake --install /tmp
 FROM    alpine:latest
 COPY    --from=0 /usr/local/bin /usr/local/bin
 
+# install idnits
+RUN     apk add --no-cache bash curl gawk aspell aspell-en
+# TODO: we may want to install languagetool, too
+RUN     curl -L -o idnits.tgz https://tools.ietf.org/tools/idnits/idnits-2.16.05.tgz
+RUN     tar xv --strip-components=1 -C /bin -f idnits.tgz
+RUN     rm idnits.tgz
+
 # install xml2rfc
 RUN     apk add --no-cache \
                 py3-appdirs \
@@ -50,7 +57,7 @@ ENV     GOPATH=/
 RUN     go get github.com/blampe/goat
 
 # install ditaa
-RUN     apk add --no-cache curl openjdk11 ttf-dejavu
+RUN     apk add --no-cache openjdk11 ttf-dejavu
 RUN     curl -L -o /bin/ditaa.jar https://github.com/stathissideris/ditaa/releases/download/v0.11.0/ditaa-0.11.0-standalone.jar
 RUN     echo '#! /bin/sh' > /bin/ditaa
 RUN     echo 'java -jar /bin/ditaa.jar $@' >> /bin/ditaa

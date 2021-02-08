@@ -35,7 +35,7 @@ jobs:
       - name: Run tests
         run: |
           chmod -R a+rwX $GITHUB_WORKSPACE
-          docker run -v $GITHUB_WORKSPACE:/id --cap-add=SYS_ADMIN $IMAGE_NAME kdrfc -h -3 /id/draft-i-d-toolchain-test.md
+          docker run -v $GITHUB_WORKSPACE:/id --cap-add=SYS_ADMIN $IMAGE_NAME kdrfc -h -3 -i /id/draft-i-d-toolchain-test-00.md
 
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
