@@ -64,5 +64,7 @@ These are the tools that are currently installed in this image:
   * [mermaid](https://github.com/mermaid-js/mermaid-cli)
   * [tex2svg](https://github.com/mathjax/mathjax-node-cli)
   * [asciiTeX](https://github.com/larseggert/asciiTeX)
+* [mmark](https://github.com/mmarkdown/mmark)
+* [idnits](https://tools.ietf.org/tools/idnits/)
 
 Pull requests adding additional tools to the toolchain are appreciated!
