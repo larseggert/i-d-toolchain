@@ -33,7 +33,9 @@ jobs:
         run: docker build . --file Dockerfile --tag $IMAGE_NAME
 
       - name: Run tests
-        run: docker run -v $GITHUB_WORKSPACE:/id:rw --cap-add=SYS_ADMIN $IMAGE_NAME kdrfc -h -v -3 /id/draft-i-d-toolchain-test.md
+        run: |
+          chmod -R a+rwX $GITHUB_WORKSPACE
+          docker run -v $GITHUB_WORKSPACE:/id --cap-add=SYS_ADMIN $IMAGE_NAME kdrfc -h -3 /id/draft-i-d-toolchain-test.md
 
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
