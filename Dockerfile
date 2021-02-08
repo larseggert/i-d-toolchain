@@ -23,6 +23,11 @@ RUN     curl -L -o idnits.tgz https://tools.ietf.org/tools/idnits/idnits-2.16.05
 RUN     tar xv --strip-components=1 -C /bin -f idnits.tgz
 RUN     rm idnits.tgz
 
+# install mmark
+RUN     curl -L -o mmark.tgz https://github.com/mmarkdown/mmark/releases/download/v2.2.10/mmark_2.2.10_linux_amd64.tgz
+RUN     tar xv -C /bin -f mmark.tgz
+RUN     rm mmark.tgz
+
 # install xml2rfc
 RUN     apk add --no-cache \
                 py3-appdirs \
