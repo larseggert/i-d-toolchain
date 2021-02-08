@@ -29,6 +29,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Build image
+        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+
       - name: Run tests
         run: |
           chmod -R a+rwX $GITHUB_WORKSPACE
