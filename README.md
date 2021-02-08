@@ -1,10 +1,10 @@
 # i-d-toolchain
 
-This repo provides a `docker` image with all the tools installed that
+This repository provides a docker image with all the tools installed that
 [kramdown-rfc2629](https://github.com/cabo/kramdown-rfc2629) might need.
 
-This makes it possible to generate the XML and other desried formats for
-Internet-Drafts without installing any local tools, except of course `docker`.
+This makes it possible to generate the XML and other desired formats for
+Internet-Drafts without installing any local tools, except of course docker.
 
 This is free and unencumbered software released into the public domain.
 
@@ -26,9 +26,9 @@ Here is a breakdown of what the components of this rather long command are:
 * `docker run` executes a given command in a given docker container
 
 * `--pull always` makes sure that the latest published version of the docker
-  image provided in this repo is used. (This can be omitted, e.g., when running
-  without Internet connectivity, but then `docker pull` should be occasionally
-  run to update the image.)
+  image provided in this repository is used. (This can be omitted, e.g., when
+  running without Internet connectivity, but then `docker pull` should be
+  occasionally run to update the image.)
 
 * `-v $(pwd):/id:delegated` mounts the current directory into the docker
   container at the `/id` mount point. The name of the `/id` mount point can be
