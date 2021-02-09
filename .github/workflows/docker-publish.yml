@@ -21,11 +21,8 @@ env:
   IMAGE_NAME: i-d-toolchain
 
 jobs:
-  # Run tests.
-  # See also https://docs.docker.com/docker-hub/builds/automated-testing/
-  test:
+  build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
 
@@ -35,28 +32,29 @@ jobs:
           push: false
           tags: larseggert/i-d-toolchain:latest
 
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Run tests
         run: |
           chmod -R a+rwX $GITHUB_WORKSPACE
           docker run -v $GITHUB_WORKSPACE:/id --cap-add=SYS_ADMIN larseggert/i-d-toolchain kdrfc -h -3 -i /id/draft-i-d-toolchain-test-00.md
           docker run -v $GITHUB_WORKSPACE:/id --cap-add=SYS_ADMIN larseggert/i-d-toolchain mmark -html /id/draft-i-d-toolchain-test-00.md
 
-  # Push image to GitHub Packages.
-  # See also https://docs.docker.com/docker-hub/builds/
   push:
-    # Ensure test job passes before pushing image.
     needs: test
-
     runs-on: ubuntu-latest
     # if: github.event_name == 'push'
 
     steps:
-      - name: Get image
-        uses: docker/build-push-action@v2
-        with:
-          push: false
-          load: true
-          tags: larseggert/i-d-toolchain:latest
+      # - name: Get image
+      #   uses: docker/build-push-action@v2
+      #   with:
+      #     push: false
+      #     load: true
+      #     tags: larseggert/i-d-toolchain:latest
 
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
