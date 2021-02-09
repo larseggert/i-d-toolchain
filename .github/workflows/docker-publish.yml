@@ -37,6 +37,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Get image
+        uses: docker/build-push-action@v2
+        with:
+          push: false
+          load: true
+          tags: larseggert/i-d-toolchain:latest
+
       - name: Run tests
         run: |
           chmod -R a+rwX $GITHUB_WORKSPACE
@@ -49,12 +56,12 @@ jobs:
     # if: github.event_name == 'push'
 
     steps:
-      # - name: Get image
-      #   uses: docker/build-push-action@v2
-      #   with:
-      #     push: false
-      #     load: true
-      #     tags: larseggert/i-d-toolchain:latest
+      - name: Get image
+        uses: docker/build-push-action@v2
+        with:
+          push: false
+          load: true
+          tags: larseggert/i-d-toolchain:latest
 
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
