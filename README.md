@@ -66,5 +66,7 @@ These are the tools that are currently installed in this image:
   * [asciiTeX](https://github.com/larseggert/asciiTeX)
 * [mmark](https://github.com/mmarkdown/mmark)
 * [idnits](https://tools.ietf.org/tools/idnits/)
+* [rfcdiff](https://tools.ietf.org/tools/rfcdiff/)
+* [rfcmarkup](https://tools.ietf.org/tools/rfcmarkup/)
 
 Pull requests adding additional tools to the toolchain are appreciated!
