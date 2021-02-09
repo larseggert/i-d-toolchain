@@ -38,8 +38,8 @@ jobs:
       - name: Run tests
         run: |
           chmod -R a+rwX $GITHUB_WORKSPACE
-          docker run -v $GITHUB_WORKSPACE:/id --cap-add=SYS_ADMIN $IMAGE_NAME kdrfc -h -3 -i /id/draft-i-d-toolchain-test-00.md
-          docker run -v $GITHUB_WORKSPACE:/id --cap-add=SYS_ADMIN $IMAGE_NAME mmark -html /id/draft-i-d-toolchain-test-00.md
+          docker run -v $GITHUB_WORKSPACE:/id --cap-add=SYS_ADMIN larseggert/i-d-toolchain kdrfc -h -3 -i /id/draft-i-d-toolchain-test-00.md
+          docker run -v $GITHUB_WORKSPACE:/id --cap-add=SYS_ADMIN larseggert/i-d-toolchain mmark -html /id/draft-i-d-toolchain-test-00.md
 
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
@@ -63,7 +63,7 @@ jobs:
 
       - name: Push image
         run: |
-          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
+          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/larseggert/i-d-toolchain
 
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
