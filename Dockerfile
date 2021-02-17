@@ -29,7 +29,7 @@ COPY    --from=0 /tmp/wdiff /
 # install idnits
 RUN     apk add --no-cache bash curl gawk aspell aspell-en
 # TODO: we may want to install languagetool, too
-RUN     apk add --no-cache bind9-host
+RUN     apk add --no-cache bind-tools
 RUN     host -a ietf.org
 RUN     host -a tools.ietf.org
 RUN     curl -L -o idnits.tgz https://tools.ietf.org/tools/idnits/idnits-2.16.05.tgz
