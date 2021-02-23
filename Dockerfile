@@ -30,7 +30,6 @@ COPY    --from=0 /tmp/wdiff /
 RUN     apk add --no-cache bash curl gawk aspell aspell-en
 # TODO: we may want to install languagetool, too
 RUN     apk add --no-cache bind-tools
-RUN     host -a ietf.org
 RUN     host -a tools.ietf.org
 RUN     curl -L -o idnits.tgz https://tools.ietf.org/tools/idnits/idnits-2.16.05.tgz
 RUN     tar xv --strip-components=1 -C /bin -f idnits.tgz
@@ -63,7 +62,8 @@ RUN     chmod a+x /bin/rfcmarkup
 
 # install rfcdiff
 RUN     apk add --no-cache wget coreutils gawk diffutils
-RUN     curl -L -o /bin/rfcdiff https://svn.tools.ietf.org/svn/src/rfcdiff/rfcdiff
+RUN     host -a tools.ietf.org
+RUN     curl -L -o /bin/rfcdiff https://tools.ietf.org/svn/src/rfcdiff/rfcdiff
 RUN     chmod a+x /bin/rfcdiff
 
 # install kramdown-rfc2629
