@@ -16,6 +16,7 @@ RUN     cmake --install /tmp
 
 # build wdiff
 RUN     apk add --no-cache curl gawk texinfo diffutils
+RUN     echo $CURL_FLAGS
 RUN     curl $CURL_FLAGS -o wdiff.tgz https://ftp.gnu.org/gnu/wdiff/wdiff-latest.tar.gz
 RUN     mkdir -p /tmp/wdiff /wdiff
 RUN     tar xv --strip-components=1 -C /wdiff -f wdiff.tgz
@@ -32,11 +33,13 @@ ENV     CURL_FLAGS="-L --retry 999 --retry-max-time 1 -C -"
 # install idnits
 RUN     apk add --no-cache bash curl gawk aspell aspell-en
 # TODO: we may want to install languagetool, too
+RUN     echo $CURL_FLAGS
 RUN     curl $CURL_FLAGS -o idnits.tgz https://tools.ietf.org/tools/idnits/idnits-2.16.05.tgz
 RUN     tar xv --strip-components=1 -C /bin -f idnits.tgz
 RUN     rm idnits.tgz
 
 # install mmark
+RUN     echo $CURL_FLAGS
 RUN     curl $CURL_FLAGS -o mmark.tgz https://github.com/mmarkdown/mmark/releases/download/v2.2.10/mmark_2.2.10_linux_amd64.tgz
 RUN     tar xv -C /bin -f mmark.tgz
 RUN     rm mmark.tgz
@@ -58,11 +61,13 @@ RUN     apk add --no-cache \
 RUN     pip install xml2rfc
 
 # install rfcmarkup
+RUN     echo $CURL_FLAGS
 RUN     curl $CURL_FLAGS -o /bin/rfcmarkup https://tools.ietf.org/svn/src/rfcmarkup/rfcmarkup
 RUN     chmod a+x /bin/rfcmarkup
 
 # install rfcdiff
 RUN     apk add --no-cache wget coreutils gawk diffutils
+RUN     echo $CURL_FLAGS
 RUN     curl $CURL_FLAGS -o /bin/rfcdiff https://tools.ietf.org/svn/src/rfcdiff/rfcdiff
 RUN     chmod a+x /bin/rfcdiff
 
@@ -85,18 +90,21 @@ RUN     go get github.com/blampe/goat
 
 # install ditaa
 RUN     apk add --no-cache openjdk11 ttf-dejavu
+RUN     echo $CURL_FLAGS
 RUN     curl $CURL_FLAGS -o /bin/ditaa.jar https://github.com/stathissideris/ditaa/releases/download/v0.11.0/ditaa-0.11.0-standalone.jar
 RUN     echo '#! /bin/sh' > /bin/ditaa
 RUN     echo 'java -jar /bin/ditaa.jar $@' >> /bin/ditaa
 RUN     chmod a+x /bin/ditaa
 
 # install mscgen
+RUN     echo $CURL_FLAGS
 RUN     curl $CURL_FLAGS -o mscgen.tgz http://www.mcternan.me.uk/mscgen/software/mscgen-static-0.20.tar.gz
 RUN     tar xv --strip-components=1 -f mscgen.tgz
 RUN     rm mscgen.tgz
 
 # install plantuml
 RUN     apk add --no-cache graphviz ttf-droid ttf-droid-nonlatin curl
+RUN     echo $CURL_FLAGS
 RUN     curl $CURL_FLAGS -o /bin/plantuml.jar http://sourceforge.net/projects/plantuml/files/plantuml.jar/download
 RUN     echo '#! /bin/sh' > /bin/plantuml
 RUN     echo 'java -jar /bin/plantuml.jar $@' >> /bin/plantuml
