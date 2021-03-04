@@ -6,7 +6,7 @@ RUN     apk add --no-cache \
                 gcc \
                 git \
                 make
-ENV     CURL_FLAGS="-v -L --retry 999 --retry-max-time 1 -C -"
+ENV     CURL_FLAGS="-v -L --retry 999 --retry-connrefused --retry-max-time 1 -C -"
 RUN     git clone --depth=1 https://github.com/larseggert/asciiTeX.git
 RUN     cmake -E make_directory build
 RUN     cmake -B /tmp -DCMAKE_BUILD_TYPE=Release asciiTeX
@@ -28,7 +28,7 @@ RUN     make install
 FROM    alpine:latest
 COPY    --from=0 /usr/local/bin /usr/local/bin
 COPY    --from=0 /tmp/wdiff /
-ENV     CURL_FLAGS="-v -L --retry 999 --retry-max-time 1 -C -"
+ENV     CURL_FLAGS="-v -L --retry 999 --retry-connrefused --retry-max-time 1 -C -"
 
 # install idnits
 RUN     apk add --no-cache bash curl gawk aspell aspell-en
