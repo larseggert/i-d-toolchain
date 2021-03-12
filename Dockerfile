@@ -1,5 +1,3 @@
-LABEL maintainer="Lars Eggert <lars@eggert.org>"
-
 # build asciitex in build image
 FROM    alpine:latest
 RUN     apk add --no-cache \
@@ -25,8 +23,11 @@ WORKDIR /wdiff
 RUN     ./configure --prefix /tmp/wdiff
 RUN     make install
 
-# install asciitex and wdiff to final image
+
 FROM    alpine:latest
+LABEL   maintainer="Lars Eggert <lars@eggert.org>"
+
+# install asciitex and wdiff to final image
 COPY    --from=0 /usr/local/bin /usr/local/bin
 COPY    --from=0 /tmp/wdiff /
 ENV     CURL_FLAGS="-v -L --retry 999 --retry-all-errors --retry-max-time 1 -C -"
