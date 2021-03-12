@@ -16,6 +16,12 @@ jobs:
     name: "Update docker image"
     runs-on: ubuntu-latest
 
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+
     steps:
       - name: "Checkout"
         uses: actions/checkout@v2
@@ -23,6 +29,7 @@ jobs:
       - name: "Configure"
         id: config
         run: |
+          registry=ghcr.io
           ref="${{ github.ref }}"
           if [ "$ref" = "refs/heads/main" ]; then
             label=latest
@@ -30,12 +37,9 @@ jobs:
             label="${ref#refs/tags/}"
           else
             label=test
+            registry=localhost:5000
           fi
-          tag() {
-            echo "${1}/larseggert/i-d-toolchin${2}:${label}"
-          }
-          registry=ghcr.io
-          tags="$(tag "$registry" -action)"
+          tags="$registry/larseggert/i-d-toolchain:${label}
           echo "::set-output name=registry::$registry"
           echo "::set-output name=label::$label"
           echo "::set-output name=tags::$tags"
