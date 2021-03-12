@@ -35,7 +35,7 @@ jobs:
             label=test
           fi
           registry=ghcr.io
-          tags="${registry}/${{ github.repository_owner }}/${{ github.repository }}:${label}"
+          tags="${registry}/${{ github.repository }}:${label}"
           echo "::set-output name=registry::$registry"
           echo "::set-output name=label::$label"
           echo "::set-output name=tags::$tags"
