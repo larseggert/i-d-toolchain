@@ -1,3 +1,5 @@
+LABEL maintainer="Lars Eggert <lars@eggert.org>"
+
 # build asciitex in build image
 FROM    alpine:latest
 RUN     apk add --no-cache \
