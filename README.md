@@ -19,7 +19,7 @@ docker run \
        --pull always \
        -v $(pwd):/id:delegated \
        --cap-add=SYS_ADMIN \
-       docker.pkg.github.com/larseggert/i-d-toolchain/i-d-toolchain:latest \
+       ghcr.io/larseggert/i-d-toolchain:latest \
        kdrfc -h -3 draft-i-d-toolchain-test-00.md
 ```
 
@@ -43,8 +43,8 @@ Here is a breakdown of what the components of this rather long command are:
   relies on `mermaid` for processing. It can be omitted in other cases, but
   there is no harm in always passing it.
 
-* `docker.pkg.github.com/larseggert/i-d-toolchain/i-d-toolchain:latest` is the
-  name of the docker image to be run.
+* `ghcr.io/larseggert/i-d-toolchain:latest` is the name of the docker image to
+  be run.
 
 * Finally, you can specify a command to run inside the container for some
   file(s) in the current working directory. In this example, we execute
@@ -81,7 +81,7 @@ Pull requests adding additional tools to the toolchain are appreciated!
 
 * In case you see the "no basic auth credentials" error
   ```
-  docker: Error response from daemon: Head https://docker.pkg.github.com/v2/larseggert/i-d-toolchain/i-d-toolchain  /manifests/latest: no basic auth credentials
+  docker: Error response from daemon: Head https://ghcr.io/v2/larseggert/i-d-toolchain  /manifests/latest: no basic auth credentials
   ```
   you need to `docker login`, using your GitHub user name and a personal
   access token as the password. The token needs to have at least the
@@ -89,7 +89,7 @@ Pull requests adding additional tools to the toolchain are appreciated!
   here](https://github.com/settings/tokens/new).
   
   ``` shell
-  docker login -u $GITHUB_USERNAME -p $GITHUB_TOKEN docker.pkg.github.com
+  docker login -u $GITHUB_USERNAME -p $GITHUB_TOKEN ghcr.io
   ```
 
 * If you are able to run docker, but see something similar to
