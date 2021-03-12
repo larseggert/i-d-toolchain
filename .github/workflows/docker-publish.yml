@@ -50,6 +50,7 @@ jobs:
       - name: "Build image"
         uses: docker/build-push-action@v2
         with:
+          load: true
           tags: ${{ steps.config.outputs.tags }}
 
       - name: "Run tests"
