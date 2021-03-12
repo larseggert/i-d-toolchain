@@ -39,7 +39,7 @@ jobs:
             label=test
             registry=localhost:5000
           fi
-          tags="$registry/larseggert/i-d-toolchain:${label}
+          tags="${registry}/larseggert/i-d-toolchain:${label}"
           echo "::set-output name=registry::$registry"
           echo "::set-output name=label::$label"
           echo "::set-output name=tags::$tags"
