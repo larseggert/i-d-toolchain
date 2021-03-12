@@ -1,4 +1,8 @@
-.refcache
+.cache/
+.idnits/
+.java/
+.wget-hsts
+
 draft-i-d-toolchain-test.html
 draft-i-d-toolchain-test.txt
 draft-i-d-toolchain-test.xml

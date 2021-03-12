@@ -115,6 +115,8 @@ RUN     apk add --no-cache chromium
 ENV     PUPPETEER_SKIP_DOWNLOAD=1
 ENV     PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium-browser"
 RUN     npm install -g @mermaid-js/mermaid-cli
-RUN     adduser --disabled-password user user
+
+# make a user to run things under, and make their home directory /id
+RUN     adduser --disabled-password --no-create-home --home /id user user
 USER    user
-WORKDIR /home/user
+WORKDIR /id
