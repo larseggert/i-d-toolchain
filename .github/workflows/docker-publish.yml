@@ -1,80 +1,70 @@
-name: Docker
+name: "Update docker image and push to registry"
 
 on:
   push:
-    # Publish `main` as Docker `latest` image.
     branches:
       - main
-
-    # Publish `v1.2.3` tags as releases.
     tags:
       - v*
-
-  # Run tests for any PRs.
   pull_request:
-
   schedule:
-    # At minute 0 past every 6th hour
-    - cron: '0 */6 * * *'
-
-env:
-  IMAGE_NAME: i-d-toolchain
+    # At minute 0 past every 12th hour
+    - cron: '0 */12 * * *'
 
 jobs:
-  # Run tests.
-  # See also https://docs.docker.com/docker-hub/builds/automated-testing/
-  test:
+  build:
+    name: "Update docker image"
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: "Checkout"
+        uses: actions/checkout@v2
 
-      - name: Build image
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+      - name: "Configure"
+        id: config
+        run: |
+          ref="${{ github.ref }}"
+          if [ "$ref" = "refs/heads/main" ]; then
+            label=latest
+          elif [ "${ref#refs/tags/}" != "$ref" ]; then
+            label="${ref#refs/tags/}"
+          else
+            label=test
+          fi
+          tag() {
+            echo "${1}/larseggert/i-d-toolchin${2}:${label}"
+          }
+          registry=ghcr.io
+          tags="$(tag "$registry" -action)"
+          echo "::set-output name=registry::$registry"
+          echo "::set-output name=label::$label"
+          echo "::set-output name=tags::$tags"
 
-      - name: Run tests
+      - name: "Setup docker buildx"
+        uses: docker/setup-buildx-action@v1
+
+      - name: "Build image"
+        uses: docker/build-push-action@v2
+        with:
+          tags: ${{ steps.config.outputs.tags }}
+
+      - name: "Run tests"
         run: |
           chmod -R a+rwX $GITHUB_WORKSPACE
-          docker run -v $GITHUB_WORKSPACE:/id --cap-add=SYS_ADMIN $IMAGE_NAME kdrfc -h -3 -i /id/draft-i-d-toolchain-test-00.md
-          docker run -v $GITHUB_WORKSPACE:/id --cap-add=SYS_ADMIN $IMAGE_NAME mmark -html /id/draft-i-d-toolchain-test-00.md
+          docker run -v $GITHUB_WORKSPACE:/id --cap-add=SYS_ADMIN ${{ steps.config.outputs.tags }} kdrfc -h -3 -i draft-i-d-toolchain-test-00.md
+          docker run -v $GITHUB_WORKSPACE:/id --cap-add=SYS_ADMIN ${{ steps.config.outputs.tags }} mmark -html draft-i-d-toolchain-test-00.md
 
-  # Push image to GitHub Packages.
-  # See also https://docs.docker.com/docker-hub/builds/
-  push:
-    # Ensure test job passes before pushing image.
-    needs: test
+      - name: "Log into registry"
+        if: ${{ steps.config.outputs.label != 'test' }}
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GHCR_USERNAME }}
+          password: ${{ secrets.GHCR_PASSWORD }}
 
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push'
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Log into registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
-
-      # TODO: figure out a way to not build the image twice
-      - name: Build image
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME
-
-      - name: Push image
-        run: |
-          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
-
-          # Change all uppercase to lowercase
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-
-          # Strip git ref prefix from version
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-
-          # Use Docker `latest` tag convention
-          [ "$VERSION" == "main" ] && VERSION=latest
-
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
-
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
+      - name: "Push image"
+        if: ${{ steps.config.outputs.label != 'test' }}
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: ${{ steps.config.outputs.tags }}
