@@ -16,12 +16,6 @@ jobs:
     name: "Update docker image"
     runs-on: ubuntu-latest
 
-    services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
-
     steps:
       - name: "Checkout"
         uses: actions/checkout@v2
@@ -29,7 +23,6 @@ jobs:
       - name: "Configure"
         id: config
         run: |
-          registry=ghcr.io
           ref="${{ github.ref }}"
           if [ "$ref" = "refs/heads/main" ]; then
             label=latest
@@ -37,9 +30,9 @@ jobs:
             label="${ref#refs/tags/}"
           else
             label=test
-            registry=localhost:5000
           fi
-          tags="${registry}/larseggert/i-d-toolchain:${label}"
+          registry=ghcr.io
+          tags="${registry}/${{ github.repository_owner }}/${{ github.repository }}:${label}"
           echo "::set-output name=registry::$registry"
           echo "::set-output name=label::$label"
           echo "::set-output name=tags::$tags"
@@ -63,9 +56,9 @@ jobs:
         if: ${{ steps.config.outputs.label != 'test' }}
         uses: docker/login-action@v1
         with:
-          registry: ghcr.io
-          username: ${{ secrets.GHCR_USERNAME }}
-          password: ${{ secrets.GHCR_PASSWORD }}
+          registry: ${{ steps.config.outputs.registry }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.ghcr_password }}
 
       - name: "Push image"
         if: ${{ steps.config.outputs.label != 'test' }}
