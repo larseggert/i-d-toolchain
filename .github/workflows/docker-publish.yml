@@ -2,6 +2,9 @@ name: "Update docker image and push to registry"
 
 on:
   push:
+    paths:
+      - ".github/workflows/docker-publish.yml"
+      - "Dockerfile"
     branches:
       - main
     tags:
