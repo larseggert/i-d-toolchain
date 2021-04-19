@@ -55,8 +55,8 @@ jobs:
       - name: "Run tests"
         run: |
           chmod -R a+rwX $GITHUB_WORKSPACE
-          docker run -v $GITHUB_WORKSPACE:/id --cap-add=SYS_ADMIN ${{ steps.config.outputs.tags }} kdrfc -h -3 -i draft-i-d-toolchain-test-00.md
-          docker run -v $GITHUB_WORKSPACE:/id --cap-add=SYS_ADMIN ${{ steps.config.outputs.tags }} mmark -html draft-i-d-toolchain-test-00.md
+          docker run -v $GITHUB_WORKSPACE:/id:delegated --cap-add=SYS_ADMIN ${{ steps.config.outputs.tags }} kdrfc -h -3 -i draft-i-d-toolchain-test-00.md
+          docker run -v $GITHUB_WORKSPACE:/id:delegated --cap-add=SYS_ADMIN ${{ steps.config.outputs.tags }} mmark -html draft-i-d-toolchain-test-00.md
 
       - name: "Log into registry"
         if: ${{ steps.config.outputs.label != 'test' }}
