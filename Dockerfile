@@ -72,7 +72,7 @@ RUN     chmod a+x /bin/rfcdiff
 # install kramdown-rfc2629
 RUN     apk add --no-cache ruby sed
 RUN     gem install kramdown-rfc2629
-RUN     sed -i"" -e s/NXqa/a/ /usr/lib/ruby/gems/2.7.0/gems/kramdown-rfc2629-1.4.2/lib/kramdown-rfc2629.rb
+RUN     sed -i"" -e s/NXqa/Nqa/ /usr/lib/ruby/gems/2.7.0/gems/kramdown-rfc2629-1.4.2/lib/kramdown-rfc2629.rb
 ENV     KRAMDOWN_REFCACHEDIR=/tmp
 
 # install tex2svg
