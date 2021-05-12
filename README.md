@@ -70,6 +70,7 @@ These are the tools that are currently installed in this image:
   * [mermaid](https://github.com/mermaid-js/mermaid-cli)
   * [tex2svg](https://github.com/mathjax/mathjax-node-cli)
   * [asciiTeX](https://github.com/larseggert/asciiTeX)
+  * [kgt](https://github.com/katef/kgt)
 * [mmark](https://github.com/mmarkdown/mmark)
 * [idnits](https://tools.ietf.org/tools/idnits/)
 * [rfcdiff](https://tools.ietf.org/tools/rfcdiff/)
