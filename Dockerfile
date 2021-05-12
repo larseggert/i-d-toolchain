@@ -7,7 +7,7 @@ RUN     apk add --no-cache \
                 git \
                 make
 ENV     CURL_FLAGS="-v -L --retry 999 --retry-all-errors --retry-max-time 999 -C -"
-RUN     git clone --depth=1 https://github.com/larseggert/asciiTeX.git
+RUN     git clone --recursive --depth=1 https://github.com/larseggert/asciiTeX.git
 RUN     cmake -E make_directory build
 RUN     cmake -B /tmp -DCMAKE_BUILD_TYPE=Release asciiTeX
 RUN     cmake --build /tmp --config Release
@@ -22,7 +22,14 @@ RUN     tar xv --strip-components=1 -C /wdiff -f wdiff.tgz
 WORKDIR /wdiff
 RUN     ./configure --prefix /tmp/wdiff
 RUN     make install
+WORKDIR /
 
+# build kgt
+RUN     apk add --no-cache bmake
+RUN     git clone --recursive --depth=1 https://github.com/katef/kgt.git
+WORKDIR /kgt
+RUN     bmake -r install
+WORKDIR /
 
 FROM    alpine:latest
 LABEL   maintainer="Lars Eggert <lars@eggert.org>"
