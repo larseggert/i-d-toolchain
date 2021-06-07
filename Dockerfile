@@ -51,6 +51,10 @@ RUN     curl $CURL_FLAGS -o mmark.tgz https://github.com/mmarkdown/mmark/release
 RUN     tar xv -C /bin -f mmark.tgz
 RUN     rm mmark.tgz
 
+# install ietf-reviewtool
+RUN     apk add --no-cache py3-pip
+RUN     pip install ietf-reviewtool
+
 # install xml2rfc
 RUN     apk add --no-cache \
                 py3-appdirs \
@@ -58,13 +62,11 @@ RUN     apk add --no-cache \
                 py3-html5lib \
                 py3-jinja2 \
                 py3-lxml \
-                py3-pip \
                 py3-pycountry \
                 py3-pyflakes \
                 py3-requests \
                 py3-setuptools \
-                py3-six \
-                py3-yaml
+                py3-six
 RUN     pip install xml2rfc
 
 # install rfcmarkup

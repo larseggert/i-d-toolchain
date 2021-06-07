@@ -75,6 +75,7 @@ These are the tools that are currently installed in this image:
 * [idnits](https://tools.ietf.org/tools/idnits/)
 * [rfcdiff](https://tools.ietf.org/tools/rfcdiff/)
 * [rfcmarkup](https://tools.ietf.org/tools/rfcmarkup/)
+* [ietf-reviewtool](https://github.com/larseggert/ietf-reviewtool)
 
 Pull requests adding additional tools to the toolchain are appreciated!
 
