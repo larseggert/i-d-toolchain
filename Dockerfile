@@ -52,7 +52,10 @@ RUN     tar xv -C /bin -f mmark.tgz
 RUN     rm mmark.tgz
 
 # install ietf-reviewtool
-RUN     apk add --no-cache py3-pip
+RUN     apk add --no-cache py3-pip openjdk11
+RUN     curl $CURL_FLAGS -o LanguageTool-stable.zip https://www.languagetool.org/download/LanguageTool-stable.zip
+RUN     unzip -d languagetool LanguageTool-stable.zip
+ENV     LTP_PATH=/languagetool
 RUN     pip install ietf-reviewtool
 
 # install xml2rfc
