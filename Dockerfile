@@ -71,7 +71,6 @@ RUN     apk add --no-cache \
                 py3-setuptools \
                 py3-six
 RUN     pip install xml2rfc
-ENV     XML2RFC_REFCACHEDIR=/id/.cache/xml2rfc
 
 # install rfcmarkup
 RUN     curl $CURL_FLAGS -o /bin/rfcmarkup https://tools.ietf.org/svn/src/rfcmarkup/rfcmarkup
@@ -129,7 +128,6 @@ RUN     apk add --no-cache make enscript ghostscript
 RUN     pip install codespell
 
 # make a user to run things under, and make their home directory /id
-RUN     mkdir -p /id/.cache/xml2rfc
 RUN     adduser --disabled-password --no-create-home --home /id user user
 USER    user
 WORKDIR /id
