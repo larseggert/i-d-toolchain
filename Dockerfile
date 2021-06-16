@@ -84,7 +84,6 @@ RUN     chmod a+x /bin/rfcdiff
 # install kramdown-rfc2629
 RUN     apk add --no-cache ruby
 RUN     gem install kramdown-rfc2629 net-http-persistent
-ENV     KRAMDOWN_REFCACHEDIR=/id/.cache/xml2rfc
 
 # install tex2svg
 RUN     apk add --no-cache npm
