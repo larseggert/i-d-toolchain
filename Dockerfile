@@ -71,6 +71,7 @@ RUN     apk add --no-cache \
                 py3-setuptools \
                 py3-six
 RUN     pip install xml2rfc
+ENV     XML2RFC_REFCACHEDIR=/id/.cache/xml2rfc
 
 # install rfcmarkup
 RUN     curl $CURL_FLAGS -o /bin/rfcmarkup https://tools.ietf.org/svn/src/rfcmarkup/rfcmarkup
@@ -83,8 +84,8 @@ RUN     chmod a+x /bin/rfcdiff
 
 # install kramdown-rfc2629
 RUN     apk add --no-cache ruby
-RUN     gem install kramdown-rfc2629
-ENV     KRAMDOWN_REFCACHEDIR=/tmp
+RUN     gem install kramdown-rfc2629 net-http-persistent
+ENV     KRAMDOWN_REFCACHEDIR=/id/.cache/xml2rfc
 
 # install tex2svg
 RUN     apk add --no-cache npm
@@ -122,6 +123,9 @@ RUN     apk add --no-cache chromium
 ENV     PUPPETEER_SKIP_DOWNLOAD=1
 ENV     PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium-browser"
 RUN     npm install -g @mermaid-js/mermaid-cli
+
+# install various other things that i-d-template depends on
+RUN     apk add --no-cache make enscript ghostscript
 
 # make a user to run things under, and make their home directory /id
 RUN     adduser --disabled-password --no-create-home --home /id user user
