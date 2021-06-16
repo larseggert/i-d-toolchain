@@ -127,3 +127,5 @@ RUN     npm install -g @mermaid-js/mermaid-cli
 RUN     adduser --disabled-password --no-create-home --home /id user user
 USER    user
 WORKDIR /id
+
+CMD     ["/bin/bash"]
