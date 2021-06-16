@@ -126,8 +126,10 @@ RUN     npm install -g @mermaid-js/mermaid-cli
 
 # install various other things that i-d-template depends on
 RUN     apk add --no-cache make enscript ghostscript
+RUN     pip install codespell
 
 # make a user to run things under, and make their home directory /id
+RUN     mkdir -p /id/.cache/xml2rfc
 RUN     adduser --disabled-password --no-create-home --home /id user user
 USER    user
 WORKDIR /id
