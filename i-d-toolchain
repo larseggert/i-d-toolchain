@@ -76,6 +76,7 @@ shift $((OPTIND-1))
 [ "${1:-}" = "--" ] && shift
 
 if [ -n "$do_update" ]; then
+    docker pull "$DOCKER_IMAGE"
     tmp=$(mktemp /tmp/i-d-toolchain.XXXXXXXX)
     if which curl 2> /dev/null; then
         fetcher="curl --silent --location --fail --output $tmp"
@@ -91,7 +92,6 @@ if [ -n "$do_update" ]; then
         mv "$tmp" "$me" && chmod a+x "$me"&& exec "$me" "$@"
     fi
     rm "$tmp"
-    docker pull "$DOCKER_IMAGE"
 fi
 
 if [ "$#" -eq 0 ]; then
