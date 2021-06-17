@@ -1,0 +1,119 @@
+#! /usr/bin/env bash
+
+# SPDX-License-Identifier: Unlicense
+#
+# This is free and unencumbered software released into the public domain.
+#
+# Anyone is free to copy, modify, publish, use, compile, sell, or
+# distribute this software, either in source code form or as a compiled
+# binary, for any purpose, commercial or non-commercial, and by any
+# means.
+#
+# In jurisdictions that recognize copyright laws, the author or authors
+# of this software dedicate any and all copyright interest in the
+# software to the public domain. We make this dedication for the benefit
+# of the public at large and to the detriment of our heirs and
+# successors. We intend this dedication to be an overt act of
+# relinquishment in perpetuity of all present and future rights to this
+# software under copyright law.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+#
+# For more information, please refer to <https://unlicense.org>
+
+
+DOCKER_IMAGE=ghcr.io/larseggert/i-d-toolchain:latest
+GITHUB=https://raw.githubusercontent.com/larseggert/i-d-toolchain/main
+
+
+function help {
+    cat - >&2 <<-EOF
+NAME
+    i-d-toolchain - Run i-d-toolchain commands
+
+SYNOPSIS
+    i-d-toolchain [-h|-?]
+                  [-u]
+                  COMMAND
+
+REQUIRED ARGUMENTS
+  COMMAND
+          Command to execute inside the i-d-toolchain docker
+          container
+
+OPTIONS
+  -h, -?
+          Prints this help and exits
+
+  -u
+          Update this shell script and the i-d-toolchain
+          docker image
+
+EOF
+}
+
+
+function fetch {
+    tmp=$(mktemp /tmp/i-d-toolchain.XXXXXXXX)
+    if which scurl 2> /dev/null; then
+        fetcher="curl --silent --location --fail --output $tmp"
+    elif which wget 2> /dev/null; then
+        fetcher="wget --quiet --output-document=$tmp"
+    else
+        echo "Could not locate either curl or wget"
+        exit 1
+    fi
+    if $fetcher $GITHUB/i-d-toolchain; then
+        me="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+        echo "Updating $me from GitHub"
+        mv "$tmp" "$me" && chmod a+x "$me"&& exec "$me" "$@"
+    fi
+    rm "$tmp"
+}
+
+
+function update {
+    fetch "$GITHUB/i-d-toolchain"
+    docker pull "$DOCKER_IMAGE"
+}
+
+
+while getopts "h?u?" opt; do
+    case "$opt" in
+    h|\?)
+        help
+        exit 0
+        ;;
+    u)
+    do_update=1
+    ;;
+    esac
+done
+
+shift $((OPTIND-1))
+
+[ "${1:-}" = "--" ] && shift
+
+if [ -n "$do_update" ]; then
+    update
+fi
+
+if [ "$#" -eq 0 ]; then
+    cat - >&2 <<-EOF
+No command given; starting interactive bash session
+inside i-d-toolchain docker container
+EOF
+fi
+
+docker run \
+    --env XML2RFC_REFCACHEDIR=/id/.cache/xml2rfc \
+    --env KRAMDOWN_REFCACHEDIR=/id/.cache/xml2rfc \
+    --volume "$(pwd):/id:delegated" \
+    --interactive --tty \
+    --cap-add=SYS_ADMIN ${DOCKER_IMAGE} "$@"
