@@ -10,14 +10,52 @@ This is free and unencumbered software released into the public domain.
 
 ## Usage
 
-Here is an example of how to use the docker image to generate text and HTML
-versions of the included test markdown document
-`draft-i-d-toolchain-test-00.md`, which is expected to be in the current working
-directory:
+There are two ways for executing commands in this Docker image, via the
+`i-d-toolchain` bash script, and directly from your shell. The former is
+recommended.
+
+### Via the `i-d-toolchain` bash script
+
+First, download and install the `i-d-toolchain` bash script into a convenient
+location, such as `$HOME/bin`:
+```shell
+curl --output $HOME/bin/i-d-toolchain \
+     https://raw.githubusercontent.com/larseggert/i-d-toolchain/main/i-d-toolchain
+chmod a+x $HOME/bin/i-d-toolchain
+```
+
+You can then run commands in the i-d-toolchain Docker container on files inside
+the current directory like this:
+```shell
+i-d-toolchain kdrfc -h -3 draft-i-d-toolchain-test-00.md
+```
+
+In the example above, `kdrfc` would execute inside the Docker container on the
+`draft-i-d-toolchain-test-00.md` in the local directory, producing text and HTML
+versions of the `draft-i-d-toolchain-test-00.md` Markdown document. `kdrfc` can
+be replaced by any other command installed in side the image, as desired.
+
+You can run `i-d-toolchain -u` to update both the `i-d-toolchain` script and the
+underlying Docker image. Please do so occasionally, to keep using the latest
+toolchain.
+
+### Directly from your shell
+
+The `i-d-toolchain` bash script is basically a simple wrapper that passes the
+given command into a rather convoluted `docker run` incantation. You can also
+execute this directly from the shell, but it is cumbersome.
+
+In order to replicate the `i-d-toolchain kdrfc -h -3
+draft-i-d-toolchain-test-00.md` example from above, you would need to execute
+this `docker run` command:
 ``` shell
 docker run \
        --pull always \
-       -v $(pwd):/id:delegated \
+       --volume $(pwd):/id:delegated \
+       --env XML2RFC_REFCACHEDIR=/id/.cache/xml2rfc \
+       --env KRAMDOWN_REFCACHEDIR=/id/.cache/xml2rfc \
+       --interactive \
+       --tty \
        --cap-add=SYS_ADMIN \
        ghcr.io/larseggert/i-d-toolchain:latest \
        kdrfc -h -3 draft-i-d-toolchain-test-00.md
@@ -29,15 +67,22 @@ Here is a breakdown of what the components of this rather long command are:
 
 * `docker run` executes a given command in a given docker container
 
+* `--volume $(pwd):/id:delegated` mounts the current directory into the docker
+  container at the `/id` mount point. The name of the `/id` mount point **must
+  not** be changed, since it is tied to where various caches are being kept. The
+  `:delegated` can be omitted, but provides a minor speed-up.
+
 * `--pull always` makes sure that the latest published version of the docker
   image provided in this repository is used. This can be omitted, e.g., when
   running without Internet connectivity, but then `docker pull` should be
   occasionally run to update the image.
 
-* `-v $(pwd):/id:delegated` mounts the current directory into the docker
-  container at the `/id` mount point. The name of the `/id` mount point **must
-  not** be changed, since it is tied to where various caches are being kept. The
-  `:delegated` can be omitted, but provides a minor speed-up.
+* `--env` passes various environment variables to the tools of the Docker
+  container, that makes them create and use caches in the local directory.
+
+* `--interactive` keeps `stdin` attached for the session
+
+* `--tty` allocates a pseudo-TTY for the session
 
 * `--cap-add=SYS_ADMIN` is needed when the draft markdown contains artwork that
   relies on `mermaid` for processing. It can be omitted in other cases, but
@@ -55,7 +100,11 @@ Here is a breakdown of what the components of this rather long command are:
   [kramdown-rfc2629](https://github.com/cabo/kramdown-rfc2629) in order to
   convert the markdown document `draft-i-d-toolchain-test-00.md` in the current
   working directory to text and HTML. This can be replaced by any other command
-  installed in side the container, as desired.
+  installed in side the image, as desired.
+
+Also see the `docker run --help` information, and check the end of the
+`i-d-toolchain` bash script for any changes to this incantation that might not
+have been reflected in this README.
 
 ## Installed components
 
