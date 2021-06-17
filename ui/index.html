@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="apple-touch-icon-precomposed" sizes="57x57" href="favicon/apple-touch-icon-57x57.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="favicon/apple-touch-icon-114x114.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="favicon/apple-touch-icon-72x72.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="favicon/apple-touch-icon-144x144.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="60x60" href="favicon/apple-touch-icon-60x60.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="120x120" href="favicon/apple-touch-icon-120x120.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="76x76" href="favicon/apple-touch-icon-76x76.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="favicon/apple-touch-icon-152x152.png" />
+    <link rel="icon" type="image/png" href="favicon/favicon-196x196.png" sizes="196x196" />
+    <link rel="icon" type="image/png" href="favicon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/png" href="favicon/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="favicon/favicon-16x16.png" sizes="16x16" />
+    <link rel="icon" type="image/png" href="favicon/favicon-128.png" sizes="128x128" />
+    <meta name="application-name" content="I-D Converter"/>
+    <meta name="msapplication-TileColor" content="#FFFFFF" />
+    <meta name="msapplication-TileImage" content="favison/mstile-144x144.png" />
+    <meta name="msapplication-square70x70logo" content="favison/mstile-70x70.png" />
+    <meta name="msapplication-square150x150logo" content="favison/mstile-150x150.png" />
+    <meta name="msapplication-wide310x150logo" content="favison/mstile-310x150.png" />
+    <meta name="msapplication-square310x310logo" content="favison/mstile-310x310.png" />
+
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <title>I-D Converter</title>
+    <style>
+      #dropper { border-radius: 1em; }
+      .dashed { border-style: dotted; }
+      .filter-light{ filter: invert(91%) sepia(0%) saturate(15%) hue-rotate(143deg) brightness(94%) contrast(89%); }
+      .filter-success { filter: invert(39%) sepia(43%) saturate(737%) hue-rotate(100deg) brightness(97%) contrast(91%); }
+    </style>
+  </head>
+
+  <body>
+    <div class="container-fluid">
+      <div class="row align-items-center">
+        <div class="col"></div>
+
+        <div class="col-8">
+          <div class="mx-auto my-5" style="width: 30%;">
+            <img class="img-fluid" src="ietf-logo.original.jpg" alt="IETF">
+          </div>
+
+          <p class="lead text-center">
+            Convert I-Ds in Markdown or XML format
+            to HTML, text and PDF versions.
+          </p>
+
+          <div class="card border-3 rounded-card dashed" id="dropper">
+            <img class="card-img-top mx-auto mt-5 filter-light"
+                 src="file-earmark-arrow-up.svg"
+                 style="width: 20%;" id="icon"
+                 alt="Upload here">
+            <div class="card-body text-center mb-4">
+              Drag and drop I-D source files here.
+            </div>
+          </div>
+        </div>
+
+      <div class="col"></div>
+    </div>
+  </div>
+
+  <script src="jquery-3.6.0.min.js"></script>
+  <script src="bootstrap.bundle.min.js"></script>
+
+  <script>
+    $(document).ready(function() {
+      "use strict";
+
+    $("html").on("dragover dragenter", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $("#dropper").addClass("bg-light border-success");
+    });
+
+    $("html").on("dragleave", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $("#dropper").removeClass("bg-light border-success");
+    });
+
+    $("#dropper").on("dragover dragenter", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $("#dropper").addClass("bg-light border-success");
+        $("#dropper").removeClass("dashed");
+        $("#icon").addClass("filter-success");
+        $("#icon").removeClass("filter-light");
+    });
+
+    function all_off() {
+        $("#dropper").addClass("dashed");
+        $("#dropper").removeClass("bg-light border-success");
+        $("#icon").addClass("filter-light");
+        $("#icon").removeClass("filter-success");
+    }
+
+    $("#dropper, html").on("dragleave", function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      all_off();
+    });
+
+    $("html").on("drop", function(e) {
+        e.preventDefault();
+        all_off();
+
+        var files = e.target.files || e.originalEvent.dataTransfer.files;
+        var fd = new FormData();
+        for (var i = 0, file; file = files[i]; i++) {
+          fd.append("file", file);
+          console.log(file);
+        }
+        $.ajax({
+          type: "POST",
+          url: "/cgi-bin/process",
+          processData: false,
+          contentType: false,
+          data: fd,
+          success: function () {
+            alert("Data Uploaded: ");
+          }
+        });
+    });
+
+
+    });
+  </script>
+</body>
+</html>

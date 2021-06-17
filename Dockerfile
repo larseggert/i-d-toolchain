@@ -126,6 +126,15 @@ RUN     npm install -g @mermaid-js/mermaid-cli
 RUN     apk add --no-cache make enscript ghostscript
 RUN     pip install codespell
 
+# install things needed for the web service
+WORKDIR /www
+RUN     curl $CURL_FLAGS -o bootstrap.min.css https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css
+RUN     curl $CURL_FLAGS -o bootstrap.bundle.min.js https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js
+RUN     curl $CURL_FLAGS -o ietf-logo.original.jpg https://www.ietf.org/media/images/ietf-logo.original.jpg
+RUN     curl $CURL_FLAGS -o file-earmark-arrow-up.svg https://icons.getbootstrap.com/assets/icons/file-earmark-arrow-up.svg
+RUN     curl $CURL_FLAGS -o jquery-3.6.0.min.js https://code.jquery.com/jquery-3.6.0.min.js
+COPY    ui/ .
+
 # make a user to run things under, and make their home directory /id
 RUN     adduser --disabled-password --no-create-home --home /id user user
 USER    user
