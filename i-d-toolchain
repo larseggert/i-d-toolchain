@@ -59,31 +59,6 @@ EOF
 }
 
 
-function fetch {
-    tmp=$(mktemp /tmp/i-d-toolchain.XXXXXXXX)
-    if which scurl 2> /dev/null; then
-        fetcher="curl --silent --location --fail --output $tmp"
-    elif which wget 2> /dev/null; then
-        fetcher="wget --quiet --output-document=$tmp"
-    else
-        echo "Could not locate either curl or wget"
-        exit 1
-    fi
-    if $fetcher $GITHUB/i-d-toolchain; then
-        me="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
-        echo "Updating $me from GitHub"
-        mv "$tmp" "$me" && chmod a+x "$me"&& exec "$me" "$@"
-    fi
-    rm "$tmp"
-}
-
-
-function update {
-    fetch "$GITHUB/i-d-toolchain"
-    docker pull "$DOCKER_IMAGE"
-}
-
-
 while getopts "h?u?" opt; do
     case "$opt" in
     h|\?)
@@ -101,7 +76,22 @@ shift $((OPTIND-1))
 [ "${1:-}" = "--" ] && shift
 
 if [ -n "$do_update" ]; then
-    update
+    tmp=$(mktemp /tmp/i-d-toolchain.XXXXXXXX)
+    if which curl 2> /dev/null; then
+        fetcher="curl --silent --location --fail --output $tmp"
+    elif which wget 2> /dev/null; then
+        fetcher="wget --quiet --output-document=$tmp"
+    else
+        echo "Could not locate either curl or wget"
+        exit 1
+    fi
+    if $fetcher $GITHUB/i-d-toolchain; then
+        me="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+        echo "Updating $me from GitHub"
+        mv "$tmp" "$me" && chmod a+x "$me"&& exec "$me" "$@"
+    fi
+    rm "$tmp"
+    docker pull "$DOCKER_IMAGE"
 fi
 
 if [ "$#" -eq 0 ]; then
