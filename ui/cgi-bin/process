@@ -2,6 +2,122 @@
 
 import cgi
 import cgitb
+import os
+import re
+import subprocess
+import sys
+
+
+def error(msg: str) -> None:
+    print("X-Status: 501 Error")
+    print("Content-Type: text/html")
+    print()
+    print(msg)
+    sys.exit(1)
+
+
+def is_mmark(text: str) -> bool:
+    return re.search(r"^\s*%%%", text)
+
+
+def is_kramdown(text: str) -> bool:
+    return re.search(r"^\s*---", text)
+
+
+def is_xml(text: str) -> bool:
+    return re.search(r"^\s*<\?xml", text)
+
+
+def process(cmd: list, src: object) -> object:
+    return subprocess.run(
+        cmd,
+        check=False,
+        input=src,
+        capture_output=True,
+    )
+
+
+def process_md(src: object, cmd: list, fmt: str) -> tuple:
+    res = process(cmd, src)
+    if res.returncode == 0:
+        return process_xml(res.stdout, fmt)
+    return (res.returncode, res.stderr)
+
+
+def process_xml(src: object, fmt: str) -> tuple:
+    opt = {"text": "--text", "html": "--html", "pdf": "--pdf"}
+    res = process(
+        [
+            "xml2rfc",
+            opt[fmt],
+            "--v3",
+            "--utf8",
+            "--out",
+            "/dev/stdout",
+            "/dev/stdin",
+        ],
+        src,
+    )
+    return (
+        res.returncode,
+        res.stdout if res.returncode == 0 else res.stderr,
+    )
+
 
 cgitb.enable()
-cgi.test()
+
+form = cgi.FieldStorage()
+if "file" not in form or "format" not in form:
+    error("Missing form parameters")
+
+files = form["file"]
+out_format = form["format"].value
+if not isinstance(files, list):
+    files = [files]
+
+mmark = ["mmark"]
+kramdown = ["kramdown-rfc2629", "-3"]
+
+for file in files:
+    try:
+        raw = file.file.read()
+        content = raw.decode(file.encoding)
+    except ValueError:
+        continue
+
+    if file.type == "text/markdown":
+        if is_mmark(content):
+            result = process_md(raw, ["mmark"], out_format)
+        elif is_kramdown(content):
+            result = process_md(raw, kramdown, out_format)
+
+    elif file.type == "text/xml":
+        result = process_xml(raw, out_format)
+
+    elif re.search(r"^text/", file.type):
+        if is_mmark(content):
+            result = process_md(raw, ["mmark"], out_format)
+        elif is_kramdown(content):
+            result = process_md(raw, kramdown, out_format)
+
+    if result[0] == 0:
+        mime_type = {
+            "text": "text/plain",
+            "html": "text/html",
+            "pdf": "application/pdf",
+        }
+
+        extension = {
+            "text": ".txt",
+            "html": ".html",
+            "pdf": ".pdf",
+        }
+
+        filename = os.path.splitext(file.filename)[0] + extension[out_format]
+        print(f"Content-Type: {mime_type[out_format]}")
+        print(f"X-Filename: {filename}")
+        print()
+        print(result[1].decode("utf-8"))
+
+    else:
+        error("<pre>" + result[1].decode("utf-8") + "</pre>")
