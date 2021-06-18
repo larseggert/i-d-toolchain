@@ -29,7 +29,7 @@
     <style>
       #dropper { border-radius: 1em; }
       .dashed { border-style: dotted; }
-      .filter-light{ filter: invert(100%) sepia(6%) saturate(2709%) hue-rotate(175deg) brightness(95%) contrast(97%); }
+      .filter-light{ filter: invert(50%) sepia(12%) saturate(300%) hue-rotate(167deg) brightness(87%) contrast(93%); }
       .filter-success { filter: invert(39%) sepia(43%) saturate(737%) hue-rotate(100deg) brightness(97%) contrast(91%); }
     </style>
   </head>
@@ -55,12 +55,20 @@
             </div>
 
             <div class="card border-3 rounded-card dashed" id="dropper">
-              <img class="card-img-top mx-auto mt-5 filter-light"
+              <div class="spinner-border mx-auto mt-5 text-success working"
+                   style="width: 3rem; height: 3rem;"
+                   role="status"></div>
+              <img class="card-img-top mx-auto mt-5 filter-light idle"
                    src="file-earmark-arrow-up.svg"
-                   style="width: 20%;" id="icon"
+                   style="width: 3rem; height: 3rem;" id="icon"
                    alt="Upload here">
               <div class="card-body text-center mb-4">
-                Select I-D source files above or drag and drop them here.
+                <p class="working">
+                  Working...
+                </p>
+                <p class="idle">
+                  Select I-D source files above or drag and drop them here.
+                </p>
               </div>
             </div>
 
@@ -93,7 +101,7 @@
   <script src="bootstrap.bundle.min.js"></script>
 
   <script>
-    $("#progress").hide();
+    $("#progress,.working").hide();
 
     $(document).ready(function() {
       "use strict";
@@ -139,12 +147,15 @@
 
       function submit(e) {
         e.preventDefault();
-        all_off();
 
         var files = e.target.files ||
                     (e.originalEvent.dataTransfer &&
                      e.originalEvent.dataTransfer.files);
         if (files === undefined) return;
+
+        all_off();
+        $(".idle").hide();
+        $(".working").show();
 
         var fd = new FormData($("#form")[0]);
         fd.delete("format");
@@ -184,7 +195,9 @@
           },
 
           complete: function (response) {
-            $("#file").trigger("reset");
+            $("#file").val(function() { return this.defaultValue; });
+            $(".idle").show();
+            $(".working").hide();
           },
 
           error: function (response) {
