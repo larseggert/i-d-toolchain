@@ -1,0 +1,137 @@
+#! /usr/bin/env python3
+
+import base64
+import cgi
+import cgitb
+import json
+import os
+import re
+import subprocess
+import sys
+
+
+def error(msg: str) -> None:
+    print("Content-Type: application/json", end="\r\n")
+    print(end="\r\n")
+    res = {"returncode": os.EX_USAGE, "stderr": msg}
+    print(json.dumps(res), flush=True)
+    sys.exit(os.EX_USAGE)
+
+
+def is_mmark(text: str) -> bool:
+    return re.search(r"^\s*%%%", text)
+
+
+def is_kramdown(text: str) -> bool:
+    return re.search(r"^\s*---", text)
+
+
+def is_xml(text: str) -> bool:
+    return re.search(r"^\s*<\?xml", text)
+
+
+def process(cmd: list, src: object) -> object:
+    return subprocess.run(
+        cmd,
+        check=False,
+        input=src,
+        capture_output=True,
+    )
+
+
+def process_md(src: object, cmd: list, fmt: str) -> tuple:
+    res = process(cmd, src)
+    if res.returncode:
+        return res
+    return process_xml(res.stdout, fmt)
+
+
+def process_xml(src: object, fmt: str) -> tuple:
+    opt = {"text": "--text", "html": "--html", "pdf": "--pdf"}
+    return process(
+        [
+            "xml2rfc",
+            opt[fmt],
+            "--quiet",
+            "--v3",
+            "--out",
+            "/dev/stdout",
+            "/dev/stdin",
+        ],
+        src,
+    )
+
+
+def update_result(res: dict, upd: object, filename: str) -> dict:
+    res["stderr"] += upd.stderr.decode("utf-8")
+    if upd.returncode:
+        res["returncode"] = upd.returncode
+    else:
+        res["files"].append(
+            {
+                "name": filename,
+                "data": base64.b64encode(upd.stdout).decode("utf-8"),
+            }
+        )
+    return res
+
+
+cgitb.enable()
+
+form = cgi.FieldStorage()
+if "file" not in form or "format" not in form:
+    error("Missing form parameters")
+
+files = form["file"]
+out_format = form["format"].value
+if not isinstance(files, list):
+    files = [files]
+
+mmark = ["mmark"]
+kramdown = ["kramdown-rfc2629", "--v3"]
+
+result = {"returncode": 0, "stderr": "", "files": []}
+
+for file in files:
+    try:
+        raw = file.file.read()
+        content = raw.decode(file.encoding)
+    except ValueError:
+        continue
+
+    extension = {
+        "text": ".txt",
+        "html": ".html",
+        "pdf": ".pdf",
+    }
+    name = os.path.splitext(file.filename)[0] + extension[out_format]
+
+    update = None
+    if file.type == "text/markdown":
+        if is_mmark(content):
+            update = process_md(raw, mmark, out_format)
+
+        elif is_kramdown(content):
+            update = process_md(raw, kramdown, out_format)
+
+    elif file.type == "text/xml":
+        update = process_xml(raw, out_format)
+
+    elif re.search(r"^text/", file.type):
+        if is_mmark(content):
+            update = process_md(raw, mmark, out_format)
+        elif is_kramdown(content):
+            update = process_md(raw, kramdown, out_format)
+
+    if not update:
+        # TODO: add to error
+        continue
+
+    result = update_result(result, update, name)
+    if result["returncode"]:
+        error(result["stderr"])
+
+
+print("Content-Type: application/json", end="\r\n")
+print(end="\r\n")
+print(json.dumps(result), flush=True)

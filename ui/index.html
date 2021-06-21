@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="apple-touch-icon-precomposed" sizes="57x57" href="favicon/apple-touch-icon-57x57.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="favicon/apple-touch-icon-114x114.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="favicon/apple-touch-icon-72x72.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="favicon/apple-touch-icon-144x144.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="60x60" href="favicon/apple-touch-icon-60x60.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="120x120" href="favicon/apple-touch-icon-120x120.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="76x76" href="favicon/apple-touch-icon-76x76.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="favicon/apple-touch-icon-152x152.png" />
+    <link rel="icon" type="image/png" href="favicon/favicon-196x196.png" sizes="196x196" />
+    <link rel="icon" type="image/png" href="favicon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/png" href="favicon/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="favicon/favicon-16x16.png" sizes="16x16" />
+    <link rel="icon" type="image/png" href="favicon/favicon-128.png" sizes="128x128" />
+    <meta name="application-name" content="I-D Converter"/>
+    <meta name="msapplication-TileColor" content="#FFFFFF" />
+    <meta name="msapplication-TileImage" content="favison/mstile-144x144.png" />
+    <meta name="msapplication-square70x70logo" content="favison/mstile-70x70.png" />
+    <meta name="msapplication-square150x150logo" content="favison/mstile-150x150.png" />
+    <meta name="msapplication-wide310x150logo" content="favison/mstile-310x150.png" />
+    <meta name="msapplication-square310x310logo" content="favison/mstile-310x310.png" />
+
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <title>I-D Converter</title>
+    <style>
+      #dropper { border-radius: 1em; }
+      .dashed { border-style: dotted; }
+      .filter-light{ filter: invert(50%) sepia(12%) saturate(300%) hue-rotate(167deg) brightness(87%) contrast(93%); }
+      .filter-success { filter: invert(39%) sepia(43%) saturate(737%) hue-rotate(100deg) brightness(97%) contrast(91%); }
+      .filter-danger { filter: invert(16%) sepia(80%) saturate(1767%) hue-rotate(331deg) brightness(92%) contrast(96%); }
+    </style>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="https://github.com/larseggert/i-d-toolchain">I-D Converter</a>
+        <a class="navbar-brand" href="https://github.com/larseggert/i-d-toolchain">
+        <img src="github.svg" alt="" width="30" height="24">
+        </a>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row align-items-center">
+        <div class="col"></div>
+
+        <div class="col-8">
+          <div class="mx-auto my-5" style="width: 30%;">
+            <img class="img-fluid" src="ietf-logo.original.jpg" alt="IETF">
+          </div>
+
+          <p class="lead text-center mb-5">
+            Convert Internet-Drafts written in Markdown or XML format
+            to HTML, text or PDF.
+          </p>
+
+          <form id="form" method="post" action="/cgi-bin/process">
+            <div class="mb-3">
+            <input class="form-control form-control-lg" type="file" id="file" multiple>
+            </div>
+
+            <div class="card border-3 rounded-card dashed" id="dropper">
+              <div class="spinner-border mx-auto mt-5 text-success working"
+                   style="width: 4rem; height: 4rem;"
+                   role="status"></div>
+              <img class="card-img-top mx-auto mt-5 filter-light idle"
+                   src="file-earmark-arrow-up.svg"
+                   style="width: 4rem; height: 4rem;" id="icon"
+                   alt="Upload here">
+              <div class="lead card-body text-center mb-4">
+                <p class="working">
+                  Working...
+                </p>
+                <p class="lead idle">
+                  Select I-D source files above or drag and drop them here.
+                </p>
+              </div>
+            </div>
+
+            <div class="btn-group btn-group-lg col-12 mt-3" role="group" aria-label="Select output format">
+              <input type="radio" class="btn-check" name="format" id="html" autocomplete="off">
+              <label class="btn btn-outline-secondary" for="html">HTML</label>
+
+              <input type="radio" class="btn-check" name="format" id="text" autocomplete="off">
+              <label class="btn btn-outline-secondary" for="text">Text</label>
+
+              <input type="radio" class="btn-check" name="format" id="pdf" autocomplete="off">
+              <label class="btn btn-outline-secondary" for="pdf">PDF</label>
+            </div>
+
+          </form>
+
+          <div class="progress mt-3" id="progress">
+            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+
+          <div class="" id="result"></div>
+
+          <div class="mt-3 alert alert-danger" role="alert" id="error">
+            <h4 class="alert-heading">
+              <img src="bug.svg" alt="Bug" class="filter-danger"
+                   style="vertical-align:middle; height: 1.25em;">
+              Error
+            </h4>
+            <p>
+              An error occurred during processing. Please see below for details.
+              If this error persists, please
+              <a href="https://github.com/larseggert/i-d-toolchain/issues/new">
+                file an issue on GitHub
+              </a>.
+            </p>
+            <hr>
+            <div id="error-msg"></div>
+          </div>
+          <pre class="mt-3 alert alert-secondary" id="log">
+          </pre>
+        </div>
+
+      <div class="col"></div>
+    </div>
+  </div>
+
+  <script src="jquery-3.6.0.min.js"></script>
+  <script src="bootstrap.bundle.min.js"></script>
+
+  <script>
+    $("#log,#progress,#error,.working").hide();
+
+    $(document).ready(function() {
+      "use strict";
+
+      $("#html").click();
+
+      function all_off() {
+          $("#dropper").addClass("dashed");
+          $("#dropper").removeClass("bg-light border-success");
+          $("#icon").addClass("filter-light");
+          $("#icon").removeClass("filter-success");
+      }
+
+      function ignore(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        all_off();
+      }
+
+      $("html").on("dragover dragenter", function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          $("#dropper").addClass("bg-light border-success");
+      });
+
+      $("html").on("dragleave", function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          $("#dropper").removeClass("bg-light border-success");
+      });
+
+      $("#dropper").on("dragover dragenter", function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          $("#dropper").addClass("bg-light border-success");
+          $("#dropper").removeClass("dashed");
+          $("#icon").addClass("filter-success");
+          $("#icon").removeClass("filter-light");
+      });
+
+      $("#dropper, html").on("dragleave", ignore);
+      $("html").on("drop", ignore);
+      $("#dropper").on("drop", submit);
+      $("#form").on("change", submit);
+
+      function b64toBlob(b64Data, contentType, sliceSize) {
+        contentType = contentType || "";
+        sliceSize = sliceSize || 512;
+
+        var byteCharacters = atob(b64Data);
+        var byteArrays = [];
+
+        for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+          var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+          var byteNumbers = new Array(slice.length);
+          for (var i = 0; i < slice.length; i++) {
+            byteNumbers[i] = slice.charCodeAt(i);
+          }
+
+          var byteArray = new Uint8Array(byteNumbers);
+
+          byteArrays.push(byteArray);
+        }
+
+        var blob = new Blob(byteArrays, {type: contentType});
+        return blob;
+      }
+
+      function submit(e) {
+        e.preventDefault();
+        $("#error-msg, #log").html("");
+        $("#error, #log").hide();
+
+        var files = e.target.files ||
+                    (e.originalEvent.dataTransfer &&
+                     e.originalEvent.dataTransfer.files);
+        if (files === undefined) {
+          all_off();
+          return;
+        }
+
+        $(".idle, #error").hide();
+        $(".working").show();
+
+        var fd = new FormData($("#form")[0]);
+        fd.delete("format");
+        for (var i = 0, file; file = files[i]; i++) {
+          fd.append("file", file);
+        }
+        var type;
+        $("#form").find(":radio:checked").each(function () {
+          fd.append(this.name, $(this).attr("id"));
+          type = $(this).attr("id");
+        });
+
+        $.ajax({
+          type: "POST",
+          url: "/cgi-bin/process",
+          processData: false,
+          contentType: false,
+          data: fd,
+          success: function (response, status, xhr) {
+            console.log(response);
+
+            if (typeof response !== "object" || response.returncode) {
+              if (response.returncode) {
+                var pre = $("<pre>");
+                pre.html(response.stderr);
+                $("#error-msg").html(pre);
+              } else {
+                $("#error-msg").html(response);
+              }
+              $("#error").show();
+              all_off();
+              return;
+            }
+
+            if (response.stderr) {
+              $("#log").html(response.stderr);
+              $("#log").show();
+            }
+
+            for (var i = 0, file; file = response.files[i]; i++) {
+              var blob = b64toBlob(file.data);
+              var link = $("<a>");
+              link.attr("href", window.URL.createObjectURL(blob));
+              link.attr("download", file.name);
+              $("#result").append(link);
+              link[0].click();
+            }
+          },
+
+          complete: function (response) {
+            $("#file").val(function() { return this.defaultValue; });
+            $(".idle").show();
+            $("#progress,.working").hide();
+            all_off();
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
