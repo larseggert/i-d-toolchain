@@ -164,6 +164,7 @@ USER    user
 WORKDIR /id
 
 # start the I-D converter webservice by default
+EXPOSE  8000
 CMD     echo Open http://localhost:8000 to access the I-D Converter && \
         cd /www && \
         python3 -m http.server --cgi
