@@ -31,10 +31,20 @@
       .dashed { border-style: dotted; }
       .filter-light{ filter: invert(50%) sepia(12%) saturate(300%) hue-rotate(167deg) brightness(87%) contrast(93%); }
       .filter-success { filter: invert(39%) sepia(43%) saturate(737%) hue-rotate(100deg) brightness(97%) contrast(91%); }
+      .filter-danger { filter: invert(16%) sepia(80%) saturate(1767%) hue-rotate(331deg) brightness(92%) contrast(96%); }
     </style>
   </head>
 
   <body>
+    <nav class="navbar navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="https://github.com/larseggert/i-d-toolchain">I-D Converter</a>
+        <a class="navbar-brand" href="https://github.com/larseggert/i-d-toolchain">
+        <img src="github.svg" alt="" width="30" height="24">
+        </a>
+      </div>
+    </nav>
+
     <div class="container-fluid">
       <div class="row align-items-center">
         <div class="col"></div>
@@ -51,29 +61,29 @@
 
           <form id="form" method="post" action="/cgi-bin/process">
             <div class="mb-3">
-            <input class="form-control" type="file" id="file" multiple>
+            <input class="form-control form-control-lg" type="file" id="file" multiple>
             </div>
 
             <div class="card border-3 rounded-card dashed" id="dropper">
               <div class="spinner-border mx-auto mt-5 text-success working"
-                   style="width: 3rem; height: 3rem;"
+                   style="width: 4rem; height: 4rem;"
                    role="status"></div>
               <img class="card-img-top mx-auto mt-5 filter-light idle"
                    src="file-earmark-arrow-up.svg"
-                   style="width: 3rem; height: 3rem;" id="icon"
+                   style="width: 4rem; height: 4rem;" id="icon"
                    alt="Upload here">
-              <div class="card-body text-center mb-4">
+              <div class="lead card-body text-center mb-4">
                 <p class="working">
                   Working...
                 </p>
-                <p class="idle">
+                <p class="lead idle">
                   Select I-D source files above or drag and drop them here.
                 </p>
               </div>
             </div>
 
-            <div class="btn-group col-12 mt-3" role="group" aria-label="Select output format">
-              <input type="radio" class="btn-check" name="format" id="html" autocomplete="off" checked>
+            <div class="btn-group btn-group-lg col-12 mt-3" role="group" aria-label="Select output format">
+              <input type="radio" class="btn-check" name="format" id="html" autocomplete="off">
               <label class="btn btn-outline-secondary" for="html">HTML</label>
 
               <input type="radio" class="btn-check" name="format" id="text" autocomplete="off">
@@ -89,8 +99,26 @@
             <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
           </div>
 
-          <div class="mt-3" id="result"></div>
+          <div class="" id="result"></div>
 
+          <div class="mt-3 alert alert-danger" role="alert" id="error">
+            <h4 class="alert-heading">
+              <img src="bug.svg" alt="Bug" class="filter-danger"
+                   style="vertical-align:middle; height: 1.25em;">
+              Error
+            </h4>
+            <p>
+              An error occurred during processing. Please see below for details.
+              If this error persists, please
+              <a href="https://github.com/larseggert/i-d-toolchain/issues/new">
+                file an issue on GitHub
+              </a>.
+            </p>
+            <hr>
+            <div id="error-msg"></div>
+          </div>
+          <pre class="mt-3 alert alert-secondary" id="log">
+          </pre>
         </div>
 
       <div class="col"></div>
@@ -101,10 +129,12 @@
   <script src="bootstrap.bundle.min.js"></script>
 
   <script>
-    $("#progress,.working").hide();
+    $("#log,#progress,#error,.working").hide();
 
     $(document).ready(function() {
       "use strict";
+
+      $("#html").click();
 
       function all_off() {
           $("#dropper").addClass("dashed");
@@ -145,16 +175,44 @@
       $("#dropper").on("drop", submit);
       $("#form").on("change", submit);
 
+      function b64toBlob(b64Data, contentType, sliceSize) {
+        contentType = contentType || "";
+        sliceSize = sliceSize || 512;
+
+        var byteCharacters = atob(b64Data);
+        var byteArrays = [];
+
+        for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+          var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+          var byteNumbers = new Array(slice.length);
+          for (var i = 0; i < slice.length; i++) {
+            byteNumbers[i] = slice.charCodeAt(i);
+          }
+
+          var byteArray = new Uint8Array(byteNumbers);
+
+          byteArrays.push(byteArray);
+        }
+
+        var blob = new Blob(byteArrays, {type: contentType});
+        return blob;
+      }
+
       function submit(e) {
         e.preventDefault();
+        $("#error-msg, #log").html("");
+        $("#error, #log").hide();
 
         var files = e.target.files ||
                     (e.originalEvent.dataTransfer &&
                      e.originalEvent.dataTransfer.files);
-        if (files === undefined) return;
+        if (files === undefined) {
+          all_off();
+          return;
+        }
 
-        all_off();
-        $(".idle").hide();
+        $(".idle, #error").hide();
         $(".working").show();
 
         var fd = new FormData($("#form")[0]);
@@ -167,6 +225,7 @@
           fd.append(this.name, $(this).attr("id"));
           type = $(this).attr("id");
         });
+
         $.ajax({
           type: "POST",
           url: "/cgi-bin/process",
@@ -174,33 +233,41 @@
           contentType: false,
           data: fd,
           success: function (response, status, xhr) {
-            // http.server.CGIHTTPRequestHandler always sends 200 OK
-            status = xhr.getResponseHeader("X-Status") || "";
-            var content_type = xhr.getResponseHeader("Content-Type") || "";
-            var filename = xhr.getResponseHeader("X-Filename") || "";
+            console.log(response);
 
-            if (status) {
-              // an error occurred
-              $("#result").html('<div class="alert alert-danger" role="alert">' +
-                                response + '</div>');
+            if (typeof response !== "object" || response.returncode) {
+              if (response.returncode) {
+                var pre = $("<pre>");
+                pre.html(response.stderr);
+                $("#error-msg").html(pre);
+              } else {
+                $("#error-msg").html(response);
+              }
+              $("#error").show();
+              all_off();
               return;
             }
 
-            var link = $("<a>");
-            link.attr("href", "data:" + content_type + ";charset=utf-8," +
-                               encodeURIComponent(response));
-            link.attr("download", filename);
-            $("#result").html(link);
-            link[0].click();
+            if (response.stderr) {
+              $("#log").html(response.stderr);
+              $("#log").show();
+            }
+
+            for (var i = 0, file; file = response.files[i]; i++) {
+              var blob = b64toBlob(file.data);
+              var link = $("<a>");
+              link.attr("href", window.URL.createObjectURL(blob));
+              link.attr("download", file.name);
+              $("#result").append(link);
+              link[0].click();
+            }
           },
 
           complete: function (response) {
             $("#file").val(function() { return this.defaultValue; });
             $(".idle").show();
-            $(".working").hide();
-          },
-
-          error: function (response) {
+            $("#progress,.working").hide();
+            all_off();
           }
         });
       }

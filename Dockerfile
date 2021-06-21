@@ -6,7 +6,7 @@ RUN     apk add --no-cache \
                 gcc \
                 git \
                 make
-ENV     CURL="curl -v -L --retry 999 --retry-all-errors --retry-max-time 999 -O -C -"
+ENV     CURL="curl -L --retry 999 --retry-all-errors --retry-max-time 999 -O -C -"
 RUN     git clone --recursive --depth=1 https://github.com/larseggert/asciiTeX.git
 RUN     cmake -E make_directory build
 RUN     cmake -B /tmp -DCMAKE_BUILD_TYPE=Release asciiTeX
@@ -37,7 +37,7 @@ LABEL   maintainer="Lars Eggert <lars@eggert.org>"
 # install asciitex and wdiff to final image
 COPY    --from=0 /usr/local/bin /usr/local/bin
 COPY    --from=0 /tmp/wdiff /
-ENV     CURL="curl -v -L --retry 999 --retry-all-errors --retry-max-time 999 -O -C -"
+ENV     CURL="curl -L --retry 999 --retry-all-errors --retry-max-time 999 -O -C -"
 
 # install idnits
 RUN     apk add --no-cache bash curl gawk aspell aspell-en
@@ -133,6 +133,19 @@ RUN     apk add --no-cache make enscript ghostscript
 RUN     pip install codespell
 
 # install things needed for the web service
+RUN     apk add --no-cache \
+                cairo-dev \
+                font-noto \
+                gcc \
+                gdk-pixbuf-dev \
+                jpeg-dev \
+                libffi-dev \
+                musl-dev \
+                pango-dev \
+                python3-dev \
+                zlib-dev
+RUN     pip install wheel
+RUN     pip install WeasyPrint pycairo
 WORKDIR /www
 RUN     $CURL https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css
 RUN     $CURL https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css.map
@@ -141,6 +154,8 @@ RUN     $CURL https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bun
 RUN     $CURL https://code.jquery.com/jquery-3.6.0.min.js
 RUN     $CURL https://www.ietf.org/media/images/ietf-logo.original.jpg
 RUN     $CURL https://icons.getbootstrap.com/assets/icons/file-earmark-arrow-up.svg
+RUN     $CURL https://icons.getbootstrap.com/assets/icons/bug.svg
+RUN     $CURL https://icons.getbootstrap.com/assets/icons/github.svg
 COPY    ui/ .
 
 # make a user to run things under, and make their home directory /id
@@ -148,4 +163,7 @@ RUN     adduser --disabled-password --no-create-home --home /id user user
 USER    user
 WORKDIR /id
 
-CMD     ["/bin/bash"]
+# start the I-D converter webservice by default
+CMD     echo Open http://localhost:8000 to access the I-D Converter && \
+        cd /www && \
+        python3 -m http.server --cgi
