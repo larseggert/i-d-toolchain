@@ -106,6 +106,18 @@ Also see the `docker run --help` information, and check the end of the
 `i-d-toolchain` bash script for any changes to this incantation that might not
 have been reflected in this README.
 
+## Via a web UI
+
+To use a web frontend to convert I-D sources to HTML, text or PDF versions, do
+``` shell
+docker run \
+       --pull always \
+       --cap-add=SYS_ADMIN \
+       ghcr.io/larseggert/i-d-toolchain:latest
+```
+
+and then open http://localhost:8000/ in your browser.
+
 ## Installed components
 
 These are the tools that are currently installed in this image:
