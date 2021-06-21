@@ -105,7 +105,7 @@ RUN     apk add --no-cache openjdk11 ttf-dejavu
 WORKDIR /bin
 RUN     $CURL https://github.com/stathissideris/ditaa/releases/download/v0.11.0/ditaa-0.11.0-standalone.jar
 RUN     echo '#! /bin/sh' > ditaa
-RUN     echo 'java -jar ditaa-0.11.0-standalone.jar $@' >> ditaa
+RUN     echo 'java -jar /bin/ditaa-0.11.0-standalone.jar $@' >> ditaa
 RUN     chmod a+x ditaa
 
 # install mscgen
