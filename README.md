@@ -112,6 +112,7 @@ To use a web frontend to convert I-D sources to HTML, text or PDF versions, do
 ``` shell
 docker run \
        --pull always \
+       --publish 8000:8000 \
        --cap-add=SYS_ADMIN \
        ghcr.io/larseggert/i-d-toolchain:latest
 ```
