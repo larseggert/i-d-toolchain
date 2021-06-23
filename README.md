@@ -2,9 +2,14 @@
 
 This repository provides a docker image with all the tools installed that
 [kramdown-rfc2629](https://github.com/cabo/kramdown-rfc2629) might need.
+Many other relevant tools are also installed in the image,
+[see below](#installed-components). This makes it possible to generate the
+XML and other desired formats for Internet-Drafts without installing any
+local tools, except of course docker.
 
-This makes it possible to generate the XML and other desired formats for
-Internet-Drafts without installing any local tools, except of course docker.
+**NEW!** You can now convert your I-D sources via a web user interface
+running inside the container, in a drag-and-drop fashion. No need to
+execte shell commands! [Details below.](#via-a-web-ui)
 
 This is free and unencumbered software released into the public domain.
 
