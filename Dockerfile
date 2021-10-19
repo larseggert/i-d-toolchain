@@ -103,7 +103,9 @@ RUN     chmod a+x ditaa
 
 # install mscgen
 WORKDIR /
-RUN     $CURL http://www.mcternan.me.uk/mscgen/software/mscgen-static-0.20.tar.gz
+#RUN     $CURL http://www.mcternan.me.uk/mscgen/software/mscgen-static-0.20.tar.gz
+# URL above is flaky; download from archive.org instead
+RUN     $CURL https://web.archive.org/web/20210813042910/https://www.mcternan.me.uk/mscgen/software/mscgen-static-0.20.tar.gz
 RUN     tar xv --strip-components=1 -f mscgen-static-0.20.tar.gz
 RUN     rm mscgen-static-0.20.tar.gz
 
