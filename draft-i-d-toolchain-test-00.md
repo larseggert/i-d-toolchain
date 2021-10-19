@@ -95,6 +95,20 @@ pie title Pets adopted by volunteers
 absrel = [scheme] [host [port]] / discard
 ~~~
 
+# protocol
+
+~~~ protocol
+Source:16
+Reserved:40
+TTL:8
+~~~
+
+~~~ protocol-goat
+Source:16
+Reserved:40
+TTL:8
+~~~
+
 # Security Considerations
 
 This document raises no security considerations.

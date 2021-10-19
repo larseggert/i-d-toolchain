@@ -102,8 +102,8 @@ EOF
 fi
 
 docker run \
-    --env XML2RFC_REFCACHEDIR=/id/.cache/xml2rfc \
-    --env KRAMDOWN_REFCACHEDIR=/id/.cache/xml2rfc \
+    --env XML2RFC_REFCACHEDIR=/id/.cache \
+    --env KRAMDOWN_REFCACHEDIR=/id/.cache \
     --volume "$(pwd):/id:delegated" \
     --interactive --tty \
     --publish 8000:8000 \

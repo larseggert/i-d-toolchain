@@ -121,6 +121,13 @@ ENV     PUPPETEER_SKIP_DOWNLOAD=1
 ENV     PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium-browser"
 RUN     npm install -g @mermaid-js/mermaid-cli
 
+# install protocol
+WORKDIR /
+RUN     git clone --recursive --depth=1 https://github.com/luismartingarcia/protocol.git
+WORKDIR /protocol
+RUN     python3 setup.py install
+RUN     rm -rf /protocol
+
 # install various other things that i-d-template depends on
 RUN     apk add --no-cache make enscript ghostscript
 RUN     pip install codespell
