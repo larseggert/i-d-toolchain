@@ -39,9 +39,17 @@ can use.
 K = \sqrt[3]{\frac{W_{max} - cwnd_{start}}{C}}
 ~~~
 
-## goat
+## goat and aasvg
 
 ~~~ goat
+  .-.
+ |o o|
+C| | |D
+ | - |
+ '___'
+~~~
+
+~~~ aasvg
   .-.
  |o o|
 C| | |D
@@ -104,6 +112,12 @@ TTL:8
 ~~~
 
 ~~~ protocol-goat
+Source:16
+Reserved:40
+TTL:8
+~~~
+
+~~~ protocol-aasvg
 Source:16
 Reserved:40
 TTL:8
