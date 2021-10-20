@@ -93,6 +93,9 @@ RUN     apk add --no-cache go git
 ENV     GOPATH=/
 RUN     go get github.com/blampe/goat
 
+# install aasvg
+RUN     npm install -g aasvg
+
 # install ditaa
 RUN     apk add --no-cache openjdk11 ttf-dejavu
 WORKDIR /bin

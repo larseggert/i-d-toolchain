@@ -129,7 +129,7 @@ and then open http://localhost:8000/ in your browser.
 These are the tools that are currently installed in this image:
 
 * [kramdown-rfc2629](https://github.com/cabo/kramdown-rfc2629) and its
-  dependencies:
+  optional dependencies:
   * [goat](https://github.com/blampe/goat)
   * [ditaa](https://github.com/stathissideris/ditaa)
   * [mscgen](http://www.mcternan.me.uk/mscgen/)
@@ -139,11 +139,13 @@ These are the tools that are currently installed in this image:
   * [asciiTeX](https://github.com/larseggert/asciiTeX)
   * [kgt](https://github.com/katef/kgt)
   * [protocol](https://www.luismg.com/protocol/)
+  * [aasvg](https://github.com/martinthomson/aasvg)
 * [mmark](https://github.com/mmarkdown/mmark)
 * [idnits](https://tools.ietf.org/tools/idnits/)
 * [rfcdiff](https://tools.ietf.org/tools/rfcdiff/)
 * [rfcmarkup](https://tools.ietf.org/tools/rfcmarkup/)
 * [ietf-reviewtool](https://github.com/larseggert/ietf-reviewtool)
+* [svgcheck](https://pypi.org/project/svgcheck/)
 
 Pull requests adding additional tools to the toolchain are appreciated!
 
@@ -157,7 +159,7 @@ Pull requests adding additional tools to the toolchain are appreciated!
   access token as the password. The token needs to have at least the
   `read:packages` scope, and [can be generated
   here](https://github.com/settings/tokens/new).
-  
+
   ``` shell
   docker login -u $GITHUB_USERNAME -p $GITHUB_TOKEN ghcr.io
   ```
@@ -172,4 +174,4 @@ Pull requests adding additional tools to the toolchain are appreciated!
   ```
   the given file (here, `draft-i-d-toolchain-test-00.md`) is not present in the
   current working directory.
-  
+
