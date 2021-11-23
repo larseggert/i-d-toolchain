@@ -35,14 +35,14 @@ WORKDIR /
 # install idnits
 RUN     apk add --no-cache bash curl gawk aspell aspell-en
 # TODO: we may want to install languagetool, too
-RUN     $CURL https://tools.ietf.org/tools/idnits/idnits-2.16.05.tgz
-RUN     tar xv --strip-components=1 -C /bin -f idnits-2.16.05.tgz
-RUN     rm idnits-2.16.05.tgz
+RUN     $CURL https://raw.githubusercontent.com/ietf-tools/idnits-mirror/main/idnits
+RUN     chmod a+x idnits
+RUN     mv idnits /bin
 
 # install mmark
-RUN     $CURL https://github.com/mmarkdown/mmark/releases/download/v2.2.10/mmark_2.2.10_linux_amd64.tgz
-RUN     tar xv -C /bin -f mmark_2.2.10_linux_amd64.tgz
-RUN     rm mmark_2.2.10_linux_amd64.tgz
+RUN     $CURL https://github.com/mmarkdown/mmark/releases/download/v2.2.19/mmark_2.2.19_linux_amd64.tgz
+RUN     tar xv -C /bin -f mmark_2.2.19_linux_amd64.tgz
+RUN     rm mmark_2.2.19_linux_amd64.tgz
 
 # install ietf-reviewtool
 RUN     apk add --no-cache py3-pip openjdk11
